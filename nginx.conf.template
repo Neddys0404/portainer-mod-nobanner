@@ -1,0 +1,35 @@
+server {
+    listen 80;
+
+    location / {
+
+        proxy_pass http://${PORTAINER_HOSTNAME}:${PORTAINER_PORT};
+
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $http_host;
+        proxy_set_header Origin $http_origin;
+        proxy_set_header Referer $http_referer;
+
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "";
+
+        proxy_set_header Accept-Encoding "";
+
+        sub_filter_once off;
+
+        sub_filter '<base id="base"/>'
+                   '<base id="base"/><script src="/remove_be.js"></script>';
+    }
+
+    location /remove_be.js {
+        root /var/www;
+        try_files /remove_be.js =404;
+    }
+}

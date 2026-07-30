@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  portainer_proxy:
+    build: .
+    restart: unless-stopped
+
+    environment:
+      PORTAINER_HOSTNAME: portainer
+      PORTAINER_PORT: 9000
+
+    ports:
+      - "9000:80"
+
+    depends_on:
+      - portainer
+
+    networks:
+      - portainer_proxy
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    restart: unless-stopped
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+    networks:
+      - portainer_proxy
+
+networks:
+  portainer_proxy:
+
+volumes:
+  portainer_data:
